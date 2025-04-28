@@ -1,6 +1,6 @@
 import { Clock, MapPin, MenuIcon , Phone, X } from "lucide-react";
-import clsx from "clsx";
 import { menuProps } from "../types/MenuProps";
+import clsx from "clsx";
 
 export default function Menu({ isOpen, onClick }: menuProps){
     return(
