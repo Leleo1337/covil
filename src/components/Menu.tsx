@@ -10,7 +10,7 @@ export default function Menu({ isOpen, onClick }: menuProps){
             </button >
             <div
             className={clsx(
-                "absolute mx-auto right-0 w-screen p-4 mt-3 bg-amber-800/90 text-white shadow-md z-10 origin-top transition-all duration-200 ease-in-out",
+                "absolute mx-auto right-0 w-screen p-4 mt-1 bg-amber-800/90 text-white shadow-md z-10 origin-top transition-all duration-200 ease-in-out",
                 isOpen ? "scale-y-100 opacity-100" : "scale-y-0"
             )}>
                 <ul className="flex flex-col gap-3">
