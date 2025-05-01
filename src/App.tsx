@@ -113,7 +113,7 @@ function App() {
                   </ul>
                </nav>
                <div className="sm:hidden">
-                  <Menu isOpen={isMenuOpen} onClick={() => setIsMenuOpen(!isMenuOpen)} />
+                  <Menu isOpen={isMenuOpen} onClick={() => setIsMenuOpen(!isMenuOpen)} refs={{homeSectionRef,historySectionRef,galerySectionRef,contactSectionRef,reserveDivRef}} />
                </div>
             </div>
          </header>
