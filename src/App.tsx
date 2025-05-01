@@ -4,23 +4,71 @@ import { useEffect, useRef, useState } from "react";
 // components
 import Menu from "./components/Menu";
 import Card from "./components/Card";
-import GaleryPhoto from "./components/GaleryPhoto";
-import { ArrowDown, Beer, ClockIcon, Handshake, Instagram, MailIcon, MapIcon, Music, PhoneIcon } from "lucide-react";
+import Photo from "./components/Photo";
+import {
+   ArrowDown,
+   ArrowLeft,
+   ArrowRight,
+   Beer,
+   ClockIcon,
+   Facebook,
+   Handshake,
+   Instagram,
+   MailIcon,
+   MapIcon,
+   Music,
+   PhoneIcon,
+   Twitter,
+} from "lucide-react";
 
 // utils
-import { galeryPhotos, historyPhotos } from "./utils/imgPathsObj";
+import { galeryPhotos as galeryPhotosData, historyPhotos } from "./data/imgDatas.ts";
 
 // functions
 import { handleScrollToRef } from "./functions/handleScrollToRef";
 
+// types
+
 function App() {
-   const [isMenuOpen, setIsMenuOpen] = useState(false);
-   const [sticky, setSticky] = useState(false);
+   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+   const [sticky, setSticky] = useState<boolean>(false);
+   const [fullScreenPhotoId, setFullscreenPhotoId] = useState<number>(0);
+   const [tabIndex, setTabIndex] = useState<number>(0)
 
    const homeSectionRef = useRef<HTMLElement | null>(null);
    const historySectionRef = useRef<HTMLElement | null>(null);
    const galerySectionRef = useRef<HTMLElement | null>(null);
    const contactSectionRef = useRef<HTMLElement | null>(null);
+   const reserveDivRef = useRef<HTMLDivElement | null>(null);
+
+   const renderGalery = galeryPhotosData.slice(tabIndex * 6, tabIndex * 6 + 6).map((item) => (
+      <Photo
+         key={item.id}
+         id={item.id}
+         img={item.img}
+         text={item.text}
+         toggleFullscreen={() => toggleFullScreenPhoto(item.id)}
+         closeFullscreen={() => setFullscreenPhotoId(0)}
+         fullscreen={fullScreenPhotoId === item.id}
+      />
+   ));
+
+   function showNextTab() {
+      const maxTabs = Math.ceil(galeryPhotosData.length / 6) - 1;
+      setTabIndex(prev => (prev < maxTabs ? prev + 1 : prev));
+   }
+   
+   function showPreviousTab() {
+      setTabIndex(prev => (prev > 0 ? prev - 1 : 0));
+   }
+
+   function toggleFullScreenPhoto(id: number) {
+      return setFullscreenPhotoId((prev) => (id === prev ? 0 : id));
+   }
+
+   useEffect(() => {
+      fullScreenPhotoId > 0 ? (document.body.style.overflowY = "hidden") : (document.body.style.overflowY = "auto");
+   }, [fullScreenPhotoId]);
 
    useEffect(() => {
       const handleScroll = () => {
@@ -45,25 +93,17 @@ function App() {
                <h1 className="text-2xl font-bold text-white text-center ">Covil dos Guri</h1>
                <nav className="hidden sm:block">
                   <ul className="flex items-center gap-3 md:gap-8 text-white text-base">
-                     <li
-                        onClick={() => handleScrollToRef(homeSectionRef)}
-                        className="cursor-pointer hover:text-amber-300 transition ease-in duration-75">
-                        Inicio
+                     <li className="cursor-pointer hover:text-amber-300 transition ease-in duration-75">
+                        <a onClick={() => handleScrollToRef(homeSectionRef)}>Início</a>
                      </li>
-                     <li
-                        onClick={() => handleScrollToRef(historySectionRef)}
-                        className="cursor-pointer hover:text-amber-300 transition ease-in duration-75">
-                        Sobre
+                     <li className="cursor-pointer hover:text-amber-300 transition ease-in duration-75">
+                        <a onClick={() => handleScrollToRef(historySectionRef)}>Sobre</a>
                      </li>
-                     <li
-                        onClick={() => handleScrollToRef(galerySectionRef)}
-                        className="cursor-pointer hover:text-amber-300 transition ease-in duration-75">
-                        Galeria
+                     <li className="cursor-pointer hover:text-amber-300 transition ease-in duration-75">
+                        <a onClick={() => handleScrollToRef(galerySectionRef)}>Galeria</a>
                      </li>
-                     <li
-                        onClick={() => handleScrollToRef(contactSectionRef)}
-                        className="cursor-pointer hover:text-amber-300 transition ease-in duration-75">
-                        Contato
+                     <li className="cursor-pointer hover:text-amber-300 transition ease-in duration-75">
+                        <a onClick={() => handleScrollToRef(contactSectionRef)}>Contato</a>
                      </li>
                      <li>
                         <button className="bg-amber-600 py-2 px-5 rounded-md cursor-pointer hover:bg-amber-700 transition ease-in duration-75">
@@ -88,11 +128,12 @@ function App() {
                      O lugar perfeito para encontrar os amigos, curtir boa música, saborear os melhores churrascos e
                      bebidas alcólicas de Nova Prata.
                   </p>
-                  <div className="flex flex-col sm:flex-row sm:justify-center sm:items-center gap-4">
+                  <div
+                     className="flex flex-col sm:flex-row sm:justify-center sm:items-center gap-4">
                      <button className="bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-lg font-semibold text-white w-full sm:w-[200px] py-3 rounded-md cursor-pointer transition ease-in duration-75">
                         Ver Cardapio
                      </button>
-                     <button className="outline-2 outline-white text-lg font-semibold text-white w-full sm:w-[200px] py-3 rounded-md cursor-pointer active:bg-white/0 hover:bg-white/20 transition ease-in duration-75">
+                     <button onClick={() => handleScrollToRef(reserveDivRef)} className="outline-2 outline-white text-lg font-semibold text-white w-full sm:w-[200px] py-3 rounded-md cursor-pointer active:bg-white/0 hover:bg-white/20 transition ease-in duration-75">
                         Fazer Reserva
                      </button>
                   </div>
@@ -148,13 +189,13 @@ function App() {
                         <div className="flex flex-col justify-center items-center md:flex-row gap-2 lg:gap-6 pt-14">
                            <Card
                               icon={<Beer size={30} color="#d97706" />}
-                              title={"Cervejas/Chop"}
-                              text={"variedade de sabores"}
+                              title={"Bebidas"}
+                              text={"Variedade de bebidas alcólicas"}
                            />
                            <Card
                               icon={<Music size={30} color="#d97706" />}
                               title={"Música"}
-                              text={"Michael jackson e vini aos sabados"}
+                              text={"Zezé Di Camargo & Luciano aos sabados"}
                            />
                            <Card
                               icon={<Handshake size={30} color="#d97706" />}
@@ -173,16 +214,14 @@ function App() {
                      <p className="text-gray-600">Momentos da Gurizada no covil</p>
                      <div className="w-20 bg-amber-500 h-1"></div>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 grid-rows-2 h-full gap-4 pt-16 pb-8 max-h-[1000px]">
-                     <GaleryPhoto img={galeryPhotos.galeryFirst} text="Essa noite foi Louca..." />
-                     <GaleryPhoto img={galeryPhotos.galerySecond} text="Maromba & mansão maromba..." />
-                     <GaleryPhoto img={galeryPhotos.galeryThird} text="Um verdadeiro carro vermelho" />
-                     <GaleryPhoto img={galeryPhotos.galeryFourth} text="A mais bela culinaria da casa" />
-                     <GaleryPhoto img={galeryPhotos.galeryFifth} text="Reunião de negocios..." />
-                     <GaleryPhoto
-                        img={galeryPhotos.galerySixth}
-                        text="Nossos chef's profissionais e altamente qualificados"
-                     />
+                  <div>
+                     <div className="grid grid-cols-2 md:grid-cols-3 grid-rows-2 h-full gap-4 pt-16 pb-8 max-h-[1000px] relative z-1">
+                        {renderGalery}
+                     </div>
+                     <div className="flex items-center justify-center pb-8 gap-4">
+                        <ArrowLeft onClick={showPreviousTab} className="cursor-pointer hover:text-amber-500"/>
+                        <ArrowRight onClick={showNextTab} className="cursor-pointer hover:text-amber-500"/>
+                     </div>
                   </div>
                   <div>
                      <div className="flex gap-2 justify-center text-amber-800">
@@ -199,7 +238,7 @@ function App() {
                   </div>
                </div>
             </section>
-            <section ref={contactSectionRef} className="bg-amber-800/5">
+            <section ref={contactSectionRef} className="bg-amber-800/5 pb-24">
                <div className="container mx-auto pt-16 p-4">
                   <div className="flex flex-col justify-center items-center gap-4 pb-16">
                      <h1 className="text-2xl md:text-4xl text-amber-800 font-bold">Localização & Contato</h1>
@@ -261,7 +300,7 @@ function App() {
                               </div>
                            </div>
                         </div>
-                        <div className="bg-amber-900/8 rounded-md shadow-md">
+                        <div ref={reserveDivRef} className="bg-amber-900/8 rounded-md shadow-md">
                            <div className="p-6">
                               <h3 className="text-amber-800 text-2xl font-bold pb-4">Faça sua Reserva</h3>
                               <p className="text-gray-600 text-base">
@@ -299,17 +338,15 @@ function App() {
                                        type="date"
                                        className="bg-white px-4 py-2 rounded-md border border-gray-300 focus:outline-0 focus:ring-2 focus:ring-amber-400"
                                     />
-                                    <input
-                                       type="button"
-                                       value={"Selecione o horario"}
-                                       className="bg-white px-4 py-2 rounded-md border border-gray-300 focus:outline-0 focus:ring-2 focus:ring-amber-400"
-                                    />
+                                    <button className="flex justify-between bg-white px-4 py-2 rounded-md border border-gray-300 focus:outline-0 focus:ring-2 focus:ring-amber-400">
+                                       {"Selecione"} <ArrowDown />
+                                    </button>
                                  </div>
                                  <textarea
                                     placeholder="Observações ou pedidos especiais"
                                     className="bg-white h-26 px-4 py-2 rounded-md border border-gray-300 focus:outline-0 focus:ring-2 focus:ring-amber-400"></textarea>
                               </div>
-                              <button className="w-full px-4 py-3 mt-4 bg-amber-600 text-white rounded-md">
+                              <button className="w-full px-4 py-3 mt-4 bg-amber-600 text-white rounded-md hover:bg-amber-700 active:bg-amber-600 cursor-pointer">
                                  Solicitar reserva
                               </button>
                            </div>
@@ -319,7 +356,82 @@ function App() {
                </div>
             </section>
          </main>
-         <footer></footer>
+         <footer className="w-full bg-amber-900">
+            <div className="container mx-auto p-4">
+               <div className="grid gap-8l md:grid-cols-3 lg:grid-cols-4 gap-8 border-b border-amber-700 pt-8 pb-16 md:align-middle">
+                  <div className="lg:col-span-2">
+                     <h1 className="text-lg font-bold text-white pb-4">Covil dos Guri</h1>
+                     <p className="text-amber-100 text-sm md:text-base">
+                        O melhor lugar para encontrar a gurizada,curtir boa música e saborear as melhores bebidas.
+                     </p>
+                     <div className="flex gap-4 text-white font-bold py-4">
+                        <a href="https://facebook.com" target="_blank" className="hover:text-amber-300 hover:scale-105 cursor-pointer">
+                           <Facebook />
+                        </a>
+                        <a href="https://x.com" target="_blank" className="hover:text-amber-300 hover:scale-105 cursor-pointer">
+                           <Twitter />
+                        </a>
+                        <a href="https://instagram.com/" target="_blank" className="hover:text-amber-300 hover:scale-105 cursor-pointer">
+                           <Instagram />
+                        </a>
+                     </div>
+                  </div>
+                  <div className="flex flex-col">
+                     <h1 className="text-white font-bold text-lg pb-4">links rapidos</h1>
+                     <ul className="flex flex-col gap-2 text-white text-sm md:text-base">
+                        <li>
+                           <a
+                              onClick={() => handleScrollToRef(homeSectionRef)}
+                              className="cursor-pointer text-amber-100 hover:text-amber-300 transition ease-in duration-75">
+                              Início
+                           </a>
+                        </li>
+                        <li>
+                           <a
+                              onClick={() => handleScrollToRef(historySectionRef)}
+                              className="cursor-pointer text-amber-100 hover:text-amber-300 transition ease-in duration-75">
+                              Sobre
+                           </a>
+                        </li>
+                        <li>
+                           <a
+                              onClick={() => handleScrollToRef(galerySectionRef)}
+                              className="cursor-pointer text-amber-100 hover:text-amber-300 transition ease-in duration-75">
+                              Galeria
+                           </a>
+                        </li>
+                        <li>
+                           <a
+                              onClick={() => handleScrollToRef(contactSectionRef)}
+                              className="cursor-pointer text-amber-100 hover:text-amber-300 transition ease-in duration-75">
+                              Contato
+                           </a>
+                        </li>
+                        <li>
+                           <a className="cursor-pointer text-amber-100 hover:text-amber-300 transition ease-in duration-75">
+                              Reservas
+                           </a>
+                        </li>
+                     </ul>
+                  </div>
+                  <div className=" text-sm md:text-base text-amber-100 space-y-2">
+                     <h1 className="text-lg text-white font-bold">Contato</h1>
+                     <p>Av. Placidina de Araújo - Centro</p>
+                     <p>Nova Prata - RS, 95320-000</p>
+                     <p>(54) 9999-9999</p>
+                     <p>contato@covildosguri.com.br</p>
+                  </div>
+               </div>
+               <div className="py-8 space-y-2 ">
+                  <h3 className="text-center text-amber-200 text-sm md:text-base">
+                     © 2025 Covil dos Guri. Todos os direitos reservados.
+                  </h3>
+                  <p className="text-sm text-amber-200 text-center">
+                     <a href="#" className="hover:underline">Política de Privacidade</a> | <a href="#" className="hover:underline">Termos de Uso</a>
+                  </p>
+               </div>
+            </div>
+         </footer>
       </>
    );
 }
