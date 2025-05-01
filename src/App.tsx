@@ -1,3 +1,5 @@
+import { Analytics } from "@vercel/analytics/react"
+
 // hooks
 import { useEffect, useRef, useState } from "react";
 
@@ -432,6 +434,7 @@ function App() {
                </div>
             </div>
          </footer>
+         <Analytics/>
       </>
    );
 }
